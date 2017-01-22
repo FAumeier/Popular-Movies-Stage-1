@@ -1,6 +1,9 @@
 package de.flo_aumeier.popularmoviesstage1;
 
 import android.content.Context;
+import android.graphics.Rect;
+import android.support.annotation.DimenRes;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,15 +65,22 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.PosterViewHo
 
         private ImageView mPosterImageView;
         private Context mContext;
+        private int width;
+        private int height;
 
         public PosterViewHolder(View itemView) {
             super(itemView);
             mContext = itemView.getContext();
+            width = Math.round(256 * mContext.getResources().getDisplayMetrics().density);
+            height = width;
             mPosterImageView = (ImageView) itemView.findViewById(R.id.iv_item_movie);
         }
 
         void bind(String urlOfPoster) {
-            Picasso.with(mContext).load(urlOfPoster).into(mPosterImageView);
+            Picasso.with(mContext)
+                    .load(urlOfPoster)
+                    .into(mPosterImageView);
         }
     }
+
 }
