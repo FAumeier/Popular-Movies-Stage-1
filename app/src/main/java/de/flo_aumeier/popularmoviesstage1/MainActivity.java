@@ -3,16 +3,28 @@ package de.flo_aumeier.popularmoviesstage1;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    private MovieAdapter mMovieAdapter;
+    private RecyclerView mRecyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
+                3);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mMovieAdapter = new MovieAdapter();
+        mRecyclerView.setAdapter(mMovieAdapter);
     }
 
     @Override
