@@ -1,53 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="367dp">
+    android:layout_height="wrap_content">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="8dp"
-        card_view:theme="@style/CardView">
+        style="@style/CardView">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <ImageView
                 android:id="@+id/iv_item_movie"
-                android:layout_width="185dp"
-                android:layout_height="277dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:scaleType="fitXY"
                 android:adjustViewBounds="true" />
 
             <TextView
                 android:id="@+id/tv_movie_title"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
+                android:layout_width="wrap_content"
                 android:paddingLeft="8dp"
+                android:paddingTop="8dp"
                 android:text="Interstellar"
-                android:textAppearance="@style/CardView"
-                android:textSize="24sp"
-                android:layout_below="@id/iv_item_movie" />
+                android:layout_below="@id/iv_item_movie"
+                style="@style/TextAppearance.AppCompat.Title"/>
 
             <TextView
                 android:id="@+id/tv_movie_director"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:text="Christopher Nolan"
-                android:textSize="14sp"
-                android:layout_below="@id/tv_movie_title" />
-
-            <TextView
-                android:id="@+id/tv_movie_year"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:text="(2014)"
-                android:textStyle="italic"
-                android:textSize="14sp"
-                android:layout_alignBaseline="@+id/tv_movie_director"
-                android:layout_toRightOf="@+id/tv_movie_title" />
+                android:text="Christopher Nolan (2014)"
+                android:layout_below="@id/tv_movie_title"
+                style="@style/SubheadingCardView" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
