@@ -5,9 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
 
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             Context context = MainActivity.this;
             String textToShow = "Refresh clicked";
             Toast.makeText(context, textToShow, Toast.LENGTH_SHORT).show();
+            URL url = NetworkUtils.buildUrl();
+            textToShow = url.toString();
+            Toast.makeText(context, textToShow, Toast.LENGTH_LONG).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
