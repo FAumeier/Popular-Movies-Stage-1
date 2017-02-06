@@ -1,6 +1,7 @@
 package de.flo_aumeier.popularmoviesstage1;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,9 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
+
+    private final static String TAG = MainActivity.class.getSimpleName();
 
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
@@ -49,15 +53,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //TODO: Handle Options Menu
         int itemThatWasClickedId = item.getItemId();
         if (itemThatWasClickedId == R.id.action_refresh) {
-            Context context = MainActivity.this;
-            String textToShow = "Refresh clicked";
-            Toast.makeText(context, textToShow, Toast.LENGTH_SHORT).show();
-            URL url = NetworkUtils.buildUrlMovieDetails("297761");
-            textToShow = url.toString();
-            Toast.makeText(context, textToShow, Toast.LENGTH_LONG).show();
+            makePopularMoviesQuery();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -73,5 +71,26 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
 
         mToast.show();
+    }
+
+    private void makePopularMoviesQuery() {
+        URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
+        Log.d(TAG, "Doing PopularMoviesQuery: " + urlPopularMovies.toString());
+        new PopularMoviesQueryTask().execute(urlPopularMovies);
+    }
+
+    public class PopularMoviesQueryTask extends AsyncTask<URL, Void, String> {
+
+        @Override
+        protected String doInBackground(URL... params) {
+            URL queryUrl = params[0];
+            String queryResults = null;
+            try {
+                queryResults = NetworkUtils.getResponseFromHttpUrl(queryUrl);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return queryResults;
+        }
     }
 }
