@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             Context context = MainActivity.this;
             String textToShow = "Refresh clicked";
             Toast.makeText(context, textToShow, Toast.LENGTH_SHORT).show();
-            URL url = NetworkUtils.buildUrlPopularMovies();
+            URL url = NetworkUtils.buildUrlMovieDetails("297761");
             textToShow = url.toString();
             Toast.makeText(context, textToShow, Toast.LENGTH_LONG).show();
             return true;
