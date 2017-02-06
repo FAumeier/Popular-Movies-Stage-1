@@ -12,8 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
 
@@ -23,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private RecyclerView mRecyclerView;
 
     private Toast mToast;
+    private LinkedList<Movie> mMovies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +39,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
-        int spacing = Math.round(64 * getResources().getDisplayMetrics().density); //8dp
-        boolean includeEdge = true;
         int spanCount = 2;
-        //mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge)); //See: http://stackoverflow.com/a/30701422
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
                 spanCount);
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
+        fetchPopularMovies();
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mMovieAdapter = new MovieAdapter(this);
-        mRecyclerView.setAdapter(mMovieAdapter);
     }
 
     @Override
@@ -55,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemThatWasClickedId = item.getItemId();
         if (itemThatWasClickedId == R.id.action_refresh) {
-            makePopularMoviesQuery();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -72,17 +74,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         mToast.show();
     }
-
-    private void makePopularMoviesQuery() {
+    private void fetchPopularMovies() {
         URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
         Log.d(TAG, "Doing PopularMoviesQuery: " + urlPopularMovies.toString());
-        new PopularMoviesQueryTask().execute(urlPopularMovies);
+        try {
+            mMovies = new PopularMoviesQueryTask().execute(urlPopularMovies).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        mMovieAdapter = new MovieAdapter(this, mMovies);
+        mRecyclerView.setAdapter(mMovieAdapter);
+
     }
 
-    public class PopularMoviesQueryTask extends AsyncTask<URL, Void, String> {
+    public class PopularMoviesQueryTask extends AsyncTask<URL, Void, LinkedList<Movie>> {
 
         @Override
-        protected String doInBackground(URL... params) {
+        protected LinkedList<Movie> doInBackground(URL... params) {
             URL queryUrl = params[0];
             String queryResults = null;
             try {
@@ -90,7 +100,34 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return queryResults;
+            Log.d(TAG, "Results: " + queryResults);
+            String popularMoviesString = queryResults;
+            LinkedList<Movie> movieLinkedList = parseJsonResult(popularMoviesString);
+            return movieLinkedList;
+        }
+
+        private LinkedList<Movie> parseJsonResult(String movieJSON) {
+            LinkedList<Movie> movies = new LinkedList<>();
+            try {
+                JSONObject popularMovies = new JSONObject(movieJSON);
+                JSONArray moviesArray = popularMovies.getJSONArray("results");
+                Log.d(TAG, "Result size: " + moviesArray.length());
+                for (int i = 0; i < moviesArray.length(); i++) {
+                    JSONObject movie = moviesArray.getJSONObject(i);
+                    String title = movie.getString("original_title");
+                    String posterPath = movie.getString("poster_path");
+                    String plot = movie.getString("overview");
+                    String releaseDate = movie.getString("release_date");
+                    int id = movie.getInt("id");
+                    double rating = movie.getDouble("vote_average");
+                    Movie newMovie = new Movie(id, title, releaseDate, posterPath, plot, rating);
+                    Log.d(TAG, "Adding new Movie: " + newMovie.toString());
+                    movies.add(newMovie);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return movies;
         }
     }
 }

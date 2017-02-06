@@ -24,12 +24,14 @@ public class NetworkUtils {
     private static final String PARAM_API_KEY = "api_key";
     private static final String PARAM_LANGUAGE = "language";
     private static final String LANGUAGE = "en-US";
+    private static final String PARAM_PAGE = "page";
 
     public static URL buildUrlPopularMovies() {
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
                 .appendEncodedPath(PARAM_POPULAR_MOVIES)
                 .appendQueryParameter(PARAM_API_KEY, API_KEY)
                 .appendQueryParameter(PARAM_LANGUAGE, LANGUAGE)
+                .appendQueryParameter(PARAM_PAGE, "1")
                 .build();
         URL url = null;
         try {
