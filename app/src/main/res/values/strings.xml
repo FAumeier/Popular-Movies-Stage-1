@@ -6,4 +6,6 @@
     <string name="release_date">Release Date</string>
     <string name="plot">Plot:</string>
     <string name="rating">Rating</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="a_still_from_the_movie">A Still from the movie</string>
 </resources>

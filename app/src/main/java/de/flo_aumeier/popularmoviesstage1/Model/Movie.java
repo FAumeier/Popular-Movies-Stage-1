@@ -1,4 +1,4 @@
-package de.flo_aumeier.popularmoviesstage1;
+package de.flo_aumeier.popularmoviesstage1.Model;
 
 /**
  * Created by Flo on 06.02.2017.

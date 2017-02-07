@@ -1,7 +1,6 @@
 package de.flo_aumeier.popularmoviesstage1;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,14 +11,9 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URL;
 import java.util.LinkedList;
-import java.util.List;
+
+import de.flo_aumeier.popularmoviesstage1.Model.Movie;
 
 /**
  * Created by Society on 22.01.2017.
@@ -54,8 +48,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.PosterViewHo
         boolean shouldAttachToParentImmediately = false;
         View view = layoutInflater.inflate(layoutIdForGridItem, parent,
                 shouldAttachToParentImmediately);
-        PosterViewHolder posterViewHolder = new PosterViewHolder(view);
-        return posterViewHolder;
+        return new PosterViewHolder(view);
     }
 
     @Override

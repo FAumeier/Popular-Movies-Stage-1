@@ -32,7 +32,8 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:fitsSystemWindows="true"
-                app:layout_collapseMode="parallax" />
+                app:layout_collapseMode="parallax"
+                android:contentDescription="@string/movie_poster"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -63,13 +64,15 @@
                 android:id="@+id/iv_movie_poster_toolbar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/a_still_from_the_movie"
                 />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginLeft="@dimen/item_offset">
+                android:layout_marginLeft="@dimen/item_offset"
+                android:layout_marginStart="@dimen/item_offset">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -79,7 +82,6 @@
                     android:id="@+id/tv_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="9/10"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
                 <TextView
                     android:layout_width="wrap_content"
@@ -90,7 +92,6 @@
                     android:id="@+id/tv_release_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="19.12.2012"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
             </LinearLayout>
         </LinearLayout>
@@ -106,7 +107,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_plot_header"
-                android:text="A rogue band of resistance fighters unite for a mission to steal the Death Star plans and bring a new hope to the galaxy."
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
         </RelativeLayout>
     </android.support.v4.widget.NestedScrollView>

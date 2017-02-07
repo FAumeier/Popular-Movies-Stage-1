@@ -23,6 +23,9 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 
+import de.flo_aumeier.popularmoviesstage1.Model.Movie;
+import de.flo_aumeier.popularmoviesstage1.Utils.NetworkUtils;
+
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
     public static final String INTENT_EXTRA_MOVIE_TITLE = "EXTRA_MOVIE_TITLE";
     public static final String INTENT_EXTRA_MOVIE_RATING = "EXTRA_MOVIE_RATING";
@@ -127,8 +130,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             }
             Log.d(TAG, "Results: " + queryResults);
             String popularMoviesString = queryResults;
-            LinkedList<Movie> movieLinkedList = parseJsonResult(popularMoviesString);
-            return movieLinkedList;
+            return parseJsonResult(popularMoviesString);
         }
 
         private LinkedList<Movie> parseJsonResult(String movieJSON) {

@@ -1,4 +1,4 @@
-package de.flo_aumeier.popularmoviesstage1;
+package de.flo_aumeier.popularmoviesstage1.Utils;
 
 import android.net.Uri;
 import android.util.Log;
