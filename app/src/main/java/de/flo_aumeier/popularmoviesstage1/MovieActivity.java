@@ -74,7 +74,8 @@ public class MovieActivity extends AppCompatActivity {
         int movieId = intentFromMainActivity.getIntExtra(MainActivity.INTENT_EXTRA_MOVIE_ID, 0);
         // Set a title for collapsing toolbar layout
         mCollapsingToolbarLayout.setTitle(title);
-        Picasso.with(mContext).load("https://image.tmdb.org/t/p/w342/" + pathToPoster).into(mMoviePoster);
+        Picasso.with(mContext).load("https://image.tmdb.org/t/p/w342/" + pathToPoster).into(
+                mMoviePoster); //TODO: Handle no Network Connection
         mPlot.setText(plot);
         mReleaseDate.setText(releaseDate);
         mRating.setText(String.valueOf(rating));

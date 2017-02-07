@@ -67,8 +67,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.PosterViewHo
         private ImageView mPosterImageView;
         private TextView mMovieTitle;
         private Context mContext;
-        private int width;
-        private int height;
 
         public PosterViewHolder(View itemView) {
             super(itemView);
@@ -95,5 +93,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.PosterViewHo
             int clickedPosition = getAdapterPosition();
             mOnClickListener.onListItemClick(clickedPosition);
         }
+    }
+
+    public LinkedList<Movie> getMovies() {
+        return mMovies;
     }
 }

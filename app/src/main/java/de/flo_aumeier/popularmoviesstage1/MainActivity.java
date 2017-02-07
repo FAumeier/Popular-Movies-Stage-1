@@ -13,7 +13,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -40,8 +43,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private MovieAdapter mPopularMoviesAdapter;
     private MovieAdapter mBestRatedMoviesAdapter;
     private RecyclerView mRecyclerView;
-
+    private TextView mErrorMessage;
     private ProgressBar mLoadingIndicator;
+    private RelativeLayout mErrorLayout;
+    private ImageButton mReloadButton;
 
     private Toast mToast;
     private LinkedList<Movie> mMovies;
@@ -55,15 +60,53 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        getViewsFromXML();
+        setUpReloadButton();
+
+        try {
+            fetchPopularMovies();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        } catch (NoNetworkConnectionException e) {
+            e.printStackTrace();
+            displayErrorLayout();
+        }
+
+        setUpView();
+    }
+
+    private void setUpReloadButton() {
+        mReloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    fetchPopularMovies();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                } catch (NoNetworkConnectionException e) {
+                    displayErrorLayout();
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void getViewsFromXML() {
+        mErrorMessage = (TextView) findViewById(R.id.tv_error_message);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
+        mErrorLayout = (RelativeLayout) findViewById(R.id.layout_main_error);
+        mReloadButton = (ImageButton) findViewById(R.id.ib_cloud_reload);
+    }
+
+    private void setUpView() {
+        mPopularMoviesAdapter = new MovieAdapter(this, mMovies);
+        mRecyclerView.setAdapter(mPopularMoviesAdapter);
         int spanCount = 2;
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
                 spanCount);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
-        fetchPopularMovies();
-        mPopularMoviesAdapter = new MovieAdapter(this, mMovies);
-        mRecyclerView.setAdapter(mPopularMoviesAdapter);
         mRecyclerView.setLayoutManager(gridLayoutManager);
+
         mRecyclerView.setHasFixedSize(true);
     }
 
@@ -76,22 +119,40 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemThatWasClickedId = item.getItemId();
-        if (itemThatWasClickedId == R.id.action_refresh) {
-            return true;
-        }
         switch (itemThatWasClickedId) {
             case R.id.action_refresh:
                 Log.d(TAG, "Option Refresh clicked");
+                try {
+                    fetchPopularMovies();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                } catch (NoNetworkConnectionException e) {
+                    displayErrorLayout();
+                }
+                mPopularMoviesAdapter = new MovieAdapter(this, mMovies);
+                updateRecyclerView(mPopularMoviesAdapter);
                 return true;
             case R.id.sort_order_best_rated:
                 Log.d(TAG, "Order by: Best rated");
-                fetchBestRatedMovies();
+                try {
+                    fetchBestRatedMovies();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                } catch (NoNetworkConnectionException e) {
+                    displayErrorLayout();
+                }
                 mBestRatedMoviesAdapter = new MovieAdapter(this, mMovies);
                 updateRecyclerView(mBestRatedMoviesAdapter);
                 return true;
             case R.id.sort_order_most_popular:
                 Log.d(TAG, "Order by: Most popular");
-                fetchPopularMovies();
+                try {
+                    fetchPopularMovies();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                } catch (NoNetworkConnectionException e) {
+                    displayErrorLayout();
+                }
                 mPopularMoviesAdapter = new MovieAdapter(this, mMovies);
                 updateRecyclerView(mPopularMoviesAdapter);
                 return true;
@@ -127,54 +188,66 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         return movieDetailActivityIntent;
     }
 
-    private void fetchPopularMovies() {
-        URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
-        Log.d(TAG, "Doing PopularMoviesQuery: " + urlPopularMovies.toString());
-        try {
+    private void fetchPopularMovies()
+            throws ExecutionException, InterruptedException, NoNetworkConnectionException {
+        if (NetworkUtils.isOnline(mContext)) {
+            hideErrorLayout();
+            URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
+            Log.d(TAG, "Doing PopularMoviesQuery: " + urlPopularMovies.toString());
             mMovies = new MoviesQueryTask().execute(urlPopularMovies).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            setUpView();
+        } else {
+            throw new NoNetworkConnectionException("No Internet Connection");
         }
+
     }
 
-    private void fetchBestRatedMovies() {
-        URL urlBestRatedMovies = NetworkUtils.buildUrlBestRatedMovies();
-        Log.d(TAG, "Doing BestRatedMoviesQuery: " + urlBestRatedMovies.toString());
-        try {
+    private void fetchBestRatedMovies()
+            throws ExecutionException, InterruptedException, NoNetworkConnectionException {
+        if (NetworkUtils.isOnline(mContext)) {
+            hideErrorLayout();
+            URL urlBestRatedMovies = NetworkUtils.buildUrlBestRatedMovies();
+            Log.d(TAG, "Doing BestRatedMoviesQuery: " + urlBestRatedMovies.toString());
             mMovies = new MoviesQueryTask().execute(urlBestRatedMovies).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            setUpView();
+        } else {
+            throw new NoNetworkConnectionException("No Internet Connection");
         }
+
+    }
+
+    private void hideErrorLayout() {
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mErrorLayout.setVisibility(View.GONE);
+        mErrorMessage.setVisibility(View.GONE);
+    }
+
+    private void displayErrorLayout() {
+        mRecyclerView.setVisibility(View.GONE);
+        mErrorLayout.setVisibility(View.VISIBLE);
+        mErrorMessage.setVisibility(View.VISIBLE);
     }
 
     private void updateRecyclerView(MovieAdapter adapter) {
         mRecyclerView.swapAdapter(adapter, false);
     }
 
-    private LinkedList<Movie> parseJsonResult(String movieJSON) {
+    private LinkedList<Movie> parseJsonResult(String movieJSON) throws JSONException {
         LinkedList<Movie> movies = new LinkedList<>();
-        try {
-            JSONObject popularMovies = new JSONObject(movieJSON);
-            JSONArray moviesArray = popularMovies.getJSONArray("results");
-            Log.d(TAG, "Result size: " + moviesArray.length());
-            for (int i = 0; i < moviesArray.length(); i++) {
-                JSONObject movie = moviesArray.getJSONObject(i);
-                String title = movie.getString("original_title");
-                String posterPath = movie.getString("poster_path");
-                String plot = movie.getString("overview");
-                String releaseDate = movie.getString("release_date");
-                int id = movie.getInt("id");
-                double rating = movie.getDouble("vote_average");
-                Movie newMovie = new Movie(id, title, releaseDate, posterPath, plot, rating);
-                Log.d(TAG, "Adding new Movie: " + newMovie.toString());
-                movies.add(newMovie);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        JSONObject popularMovies = new JSONObject(movieJSON);
+        JSONArray moviesArray = popularMovies.getJSONArray("results");
+        Log.d(TAG, "Result size: " + moviesArray.length());
+        for (int i = 0; i < moviesArray.length(); i++) {
+            JSONObject movie = moviesArray.getJSONObject(i);
+            String title = movie.getString("original_title");
+            String posterPath = movie.getString("poster_path");
+            String plot = movie.getString("overview");
+            String releaseDate = movie.getString("release_date");
+            int id = movie.getInt("id");
+            double rating = movie.getDouble("vote_average");
+            Movie newMovie = new Movie(id, title, releaseDate, posterPath, plot, rating);
+            Log.d(TAG, "Adding new Movie: " + newMovie.toString());
+            movies.add(newMovie);
         }
         return movies;
     }
@@ -198,7 +271,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             }
             Log.d(TAG, "Results: " + queryResults);
             String JSONMovies = queryResults;
-            return parseJsonResult(JSONMovies);
+            try {
+                return parseJsonResult(JSONMovies);
+            } catch (JSONException e) {
+                return null;
+            }
         }
 
         @Override
