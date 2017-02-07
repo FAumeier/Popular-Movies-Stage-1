@@ -12,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private MovieAdapter mBestRatedMoviesAdapter;
     private RecyclerView mRecyclerView;
 
+    private ProgressBar mLoadingIndicator;
+
     private Toast mToast;
     private LinkedList<Movie> mMovies;
     private Context mContext;
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         int spanCount = 2;
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
                 spanCount);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
         fetchPopularMovies();
         mPopularMoviesAdapter = new MovieAdapter(this, mMovies);
@@ -175,6 +180,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     public class MoviesQueryTask extends AsyncTask<URL, Void, LinkedList<Movie>> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
+        }
 
         @Override
         protected LinkedList<Movie> doInBackground(URL... params) {
@@ -190,6 +201,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             return parseJsonResult(JSONMovies);
         }
 
+        @Override
+        protected void onPostExecute(LinkedList<Movie> movies) {
+            super.onPostExecute(movies);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mLoadingIndicator.setVisibility(View.GONE);
+        }
     }
 
 }

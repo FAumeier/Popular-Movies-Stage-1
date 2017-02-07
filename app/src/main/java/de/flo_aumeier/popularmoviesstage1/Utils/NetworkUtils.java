@@ -63,7 +63,7 @@ public class NetworkUtils {
         return url;
     }
 
-    public static URL buildUrlMovieStills(String movieId) { //https://api.themoviedb.org/3/movie/207932/images?api_key=66c86590f283f43a95c4fff54da023dc
+    public static URL buildUrlMovieStills(String movieId) {
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
                 .appendEncodedPath(movieId)
                 .appendEncodedPath(PARAM_IMAGES)
