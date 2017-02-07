@@ -1,7 +1,9 @@
 package de.flo_aumeier.popularmoviesstage1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -22,7 +24,11 @@ import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
-
+    public static final String INTENT_EXTRA_MOVIE_TITLE = "EXTRA_MOVIE_TITLE";
+    public static final String INTENT_EXTRA_MOVIE_RATING = "EXTRA_MOVIE_RATING";
+    public static final String INTENT_EXTRA_MOVIE_POSTER = "EXTRA_MOVIE_POSTER";
+    public static final String INTENT_EXTRA_MOVIE_RELEASE_DATE = "EXTRA_MOVIE_RELEASE_DATE";
+    public static final String INTENT_EXTRA_MOVIE_PLOT = "EXTRA_MOVIE_PLOT";
     private final static String TAG = MainActivity.class.getSimpleName();
 
     private MovieAdapter mMovieAdapter;
@@ -30,12 +36,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private Toast mToast;
     private LinkedList<Movie> mMovies;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mContext = this;
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
@@ -66,14 +73,29 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
-        mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
-
-        mToast.show();
+        Movie movie = mMovies.get(clickedItemIndex);
+        double rating = movie.getRating();
+        String title = movie.getTitle();
+        String pathToPoster = movie.getUrlToPoster();
+        String releaseDate = movie.getReleaseDate();
+        String plot = movie.getPlot();
+        Intent movieDetailActivityIntent = getMovieIntent(rating, title, pathToPoster, releaseDate,
+                plot);
+        startActivity(movieDetailActivityIntent);
     }
+
+    @NonNull
+    private Intent getMovieIntent(double rating, String title, String pathToPoster,
+            String releaseDate, String plot) {
+        Intent movieDetailActivityIntent = new Intent(mContext, MovieActivity.class);
+        movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_TITLE, title);
+        movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_RELEASE_DATE, releaseDate);
+        movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_RATING, rating);
+        movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_PLOT, plot);
+        movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_POSTER, pathToPoster);
+        return movieDetailActivityIntent;
+    }
+
     private void fetchPopularMovies() {
         URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
         Log.d(TAG, "Doing PopularMoviesQuery: " + urlPopularMovies.toString());

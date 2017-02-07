@@ -76,28 +76,18 @@
                     android:text="@string/rating"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"/>
                 <TextView
+                    android:id="@+id/tv_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="9/10"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
-                <RatingBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dp"
-                    android:id="@+id/ratingBar_movie"
-                    android:scaleX=".7"
-                    android:scaleY=".7"
-                    android:transformPivotX="0dp"
-                    android:transformPivotY="0dp"
-                    style="?android:attr/ratingBarStyleIndicator"
-                    android:max="5"
-                    android:stepSize="1" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/release_date"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"/>
                 <TextView
+                    android:id="@+id/tv_release_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="19.12.2012"
