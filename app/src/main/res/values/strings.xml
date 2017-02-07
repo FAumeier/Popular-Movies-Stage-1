@@ -8,4 +8,6 @@
     <string name="rating">Rating</string>
     <string name="movie_poster">Movie Poster</string>
     <string name="a_still_from_the_movie">A Still from the movie</string>
+    <string name="order_by_most_popular">Order by: Most Popular</string>
+    <string name="order_by_best_rated">Order by: Best rated</string>
 </resources>

@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public static final String INTENT_EXTRA_MOVIE_ID = "EXTRA_MOVIE_ID";
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private MovieAdapter mMovieAdapter;
+    private MovieAdapter mPopularMoviesAdapter;
+    private MovieAdapter mBestRatedMoviesAdapter;
     private RecyclerView mRecyclerView;
 
     private Toast mToast;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 spanCount);
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
         fetchPopularMovies();
+        mPopularMoviesAdapter = new MovieAdapter(this, mMovies);
+        mRecyclerView.setAdapter(mPopularMoviesAdapter);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
     }
@@ -70,6 +73,23 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         int itemThatWasClickedId = item.getItemId();
         if (itemThatWasClickedId == R.id.action_refresh) {
             return true;
+        }
+        switch (itemThatWasClickedId) {
+            case R.id.action_refresh:
+                Log.d(TAG, "Option Refresh clicked");
+                return true;
+            case R.id.sort_order_best_rated:
+                Log.d(TAG, "Order by: Best rated");
+                fetchBestRatedMovies();
+                mBestRatedMoviesAdapter = new MovieAdapter(this, mMovies);
+                updateRecyclerView(mBestRatedMoviesAdapter);
+                return true;
+            case R.id.sort_order_most_popular:
+                Log.d(TAG, "Order by: Most popular");
+                fetchPopularMovies();
+                mPopularMoviesAdapter = new MovieAdapter(this, mMovies);
+                updateRecyclerView(mPopularMoviesAdapter);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -106,18 +126,55 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         URL urlPopularMovies = NetworkUtils.buildUrlPopularMovies();
         Log.d(TAG, "Doing PopularMoviesQuery: " + urlPopularMovies.toString());
         try {
-            mMovies = new PopularMoviesQueryTask().execute(urlPopularMovies).get();
+            mMovies = new MoviesQueryTask().execute(urlPopularMovies).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        mMovieAdapter = new MovieAdapter(this, mMovies);
-        mRecyclerView.setAdapter(mMovieAdapter);
-
     }
 
-    public class PopularMoviesQueryTask extends AsyncTask<URL, Void, LinkedList<Movie>> {
+    private void fetchBestRatedMovies() {
+        URL urlBestRatedMovies = NetworkUtils.buildUrlBestRatedMovies();
+        Log.d(TAG, "Doing BestRatedMoviesQuery: " + urlBestRatedMovies.toString());
+        try {
+            mMovies = new MoviesQueryTask().execute(urlBestRatedMovies).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateRecyclerView(MovieAdapter adapter) {
+        mRecyclerView.swapAdapter(adapter, false);
+    }
+
+    private LinkedList<Movie> parseJsonResult(String movieJSON) {
+        LinkedList<Movie> movies = new LinkedList<>();
+        try {
+            JSONObject popularMovies = new JSONObject(movieJSON);
+            JSONArray moviesArray = popularMovies.getJSONArray("results");
+            Log.d(TAG, "Result size: " + moviesArray.length());
+            for (int i = 0; i < moviesArray.length(); i++) {
+                JSONObject movie = moviesArray.getJSONObject(i);
+                String title = movie.getString("original_title");
+                String posterPath = movie.getString("poster_path");
+                String plot = movie.getString("overview");
+                String releaseDate = movie.getString("release_date");
+                int id = movie.getInt("id");
+                double rating = movie.getDouble("vote_average");
+                Movie newMovie = new Movie(id, title, releaseDate, posterPath, plot, rating);
+                Log.d(TAG, "Adding new Movie: " + newMovie.toString());
+                movies.add(newMovie);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return movies;
+    }
+
+    public class MoviesQueryTask extends AsyncTask<URL, Void, LinkedList<Movie>> {
 
         @Override
         protected LinkedList<Movie> doInBackground(URL... params) {
@@ -129,32 +186,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 e.printStackTrace();
             }
             Log.d(TAG, "Results: " + queryResults);
-            String popularMoviesString = queryResults;
-            return parseJsonResult(popularMoviesString);
+            String JSONMovies = queryResults;
+            return parseJsonResult(JSONMovies);
         }
 
-        private LinkedList<Movie> parseJsonResult(String movieJSON) {
-            LinkedList<Movie> movies = new LinkedList<>();
-            try {
-                JSONObject popularMovies = new JSONObject(movieJSON);
-                JSONArray moviesArray = popularMovies.getJSONArray("results");
-                Log.d(TAG, "Result size: " + moviesArray.length());
-                for (int i = 0; i < moviesArray.length(); i++) {
-                    JSONObject movie = moviesArray.getJSONObject(i);
-                    String title = movie.getString("original_title");
-                    String posterPath = movie.getString("poster_path");
-                    String plot = movie.getString("overview");
-                    String releaseDate = movie.getString("release_date");
-                    int id = movie.getInt("id");
-                    double rating = movie.getDouble("vote_average");
-                    Movie newMovie = new Movie(id, title, releaseDate, posterPath, plot, rating);
-                    Log.d(TAG, "Adding new Movie: " + newMovie.toString());
-                    movies.add(newMovie);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return movies;
-        }
     }
+
 }

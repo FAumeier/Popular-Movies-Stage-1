@@ -45,6 +45,24 @@ public class NetworkUtils {
         return url;
     }
 
+    public static URL buildUrlBestRatedMovies() {
+        Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
+                .appendEncodedPath(PARAM_BEST_RATED_MOVIES)
+                .appendQueryParameter(PARAM_API_KEY, API_KEY)
+                .appendQueryParameter(PARAM_LANGUAGE, LANGUAGE)
+                .appendQueryParameter(PARAM_PAGE, "1")
+                .build();
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+            Log.d(TAG, "Built URL: " + url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
     public static URL buildUrlMovieStills(String movieId) { //https://api.themoviedb.org/3/movie/207932/images?api_key=66c86590f283f43a95c4fff54da023dc
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
                 .appendEncodedPath(movieId)
