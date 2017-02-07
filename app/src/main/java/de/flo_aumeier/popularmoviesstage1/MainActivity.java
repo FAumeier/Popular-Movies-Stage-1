@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public static final String INTENT_EXTRA_MOVIE_POSTER = "EXTRA_MOVIE_POSTER";
     public static final String INTENT_EXTRA_MOVIE_RELEASE_DATE = "EXTRA_MOVIE_RELEASE_DATE";
     public static final String INTENT_EXTRA_MOVIE_PLOT = "EXTRA_MOVIE_PLOT";
+    public static final String INTENT_EXTRA_MOVIE_ID = "EXTRA_MOVIE_ID";
     private final static String TAG = MainActivity.class.getSimpleName();
 
     private MovieAdapter mMovieAdapter;
@@ -79,20 +80,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         String pathToPoster = movie.getUrlToPoster();
         String releaseDate = movie.getReleaseDate();
         String plot = movie.getPlot();
+        int id = movie.getId();
         Intent movieDetailActivityIntent = getMovieIntent(rating, title, pathToPoster, releaseDate,
-                plot);
+                plot, id);
         startActivity(movieDetailActivityIntent);
     }
 
     @NonNull
     private Intent getMovieIntent(double rating, String title, String pathToPoster,
-            String releaseDate, String plot) {
+            String releaseDate, String plot, int id) {
         Intent movieDetailActivityIntent = new Intent(mContext, MovieActivity.class);
         movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_TITLE, title);
         movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_RELEASE_DATE, releaseDate);
         movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_RATING, rating);
         movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_PLOT, plot);
         movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_POSTER, pathToPoster);
+        movieDetailActivityIntent.putExtra(INTENT_EXTRA_MOVIE_ID, id);
         return movieDetailActivityIntent;
     }
 

@@ -25,6 +25,7 @@ public class NetworkUtils {
     private static final String PARAM_LANGUAGE = "language";
     private static final String LANGUAGE = "en-US";
     private static final String PARAM_PAGE = "page";
+    private static final String PARAM_IMAGES = "images";
 
     public static URL buildUrlPopularMovies() {
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
@@ -44,11 +45,11 @@ public class NetworkUtils {
         return url;
     }
 
-    public static URL buildUrlMovieDetails(String movieId) {
+    public static URL buildUrlMovieStills(String movieId) { //https://api.themoviedb.org/3/movie/207932/images?api_key=66c86590f283f43a95c4fff54da023dc
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
                 .appendEncodedPath(movieId)
+                .appendEncodedPath(PARAM_IMAGES)
                 .appendQueryParameter(PARAM_API_KEY, API_KEY)
-                .appendQueryParameter(PARAM_LANGUAGE, LANGUAGE)
                 .build();
         URL url = null;
         try {
