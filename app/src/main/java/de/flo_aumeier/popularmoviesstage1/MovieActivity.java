@@ -11,6 +11,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -18,7 +19,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-public class MovieActivity extends AppCompatActivity  implements AppBarLayout.OnOffsetChangedListener  {
+public class MovieActivity extends AppCompatActivity {
 
     private static final float THRESHOLD_PERCENTAGE = 0.001F;
 
@@ -58,6 +59,7 @@ public class MovieActivity extends AppCompatActivity  implements AppBarLayout.On
         mRating = (TextView) findViewById(R.id.tv_rating);
         // Set the support action bar
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intentFromMainActivity = getIntent();
         double rating = intentFromMainActivity.getDoubleExtra(MainActivity.INTENT_EXTRA_MOVIE_RATING, 0.0);
         String title = intentFromMainActivity.getStringExtra(MainActivity.INTENT_EXTRA_MOVIE_TITLE);
@@ -66,24 +68,18 @@ public class MovieActivity extends AppCompatActivity  implements AppBarLayout.On
         String plot = intentFromMainActivity.getStringExtra(MainActivity.INTENT_EXTRA_MOVIE_PLOT);
         // Set a title for collapsing toolbar layout
         mCollapsingToolbarLayout.setTitle(title);
-        Picasso.with(mContext).load("https://image.tmdb.org/t/p/w185/" + pathToPoster).into(mMoviePoster);
+        Picasso.with(mContext).load("https://image.tmdb.org/t/p/w342/" + pathToPoster).into(mMoviePoster);
         mPlot.setText(plot);
         mReleaseDate.setText(releaseDate);
         mRating.setText(String.valueOf(rating));
     }
 
     @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
-        int maxScroll = appBarLayout.getTotalScrollRange();
-        float progressPercentage = (float) (Math.abs(offset)/maxScroll);
-
-        if (progressPercentage >= THRESHOLD_PERCENTAGE) {
-            //start an alpha animation on your ImageView here (i.e. fade out)
-            mMoviePoster.setVisibility(View.INVISIBLE);
-        } else {
-            //Add an opposite animation here (i.e. it fades back in again)
-            mMoviePoster.setVisibility(View.VISIBLE);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }

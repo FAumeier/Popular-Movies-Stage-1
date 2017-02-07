@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class NetworkUtils {
     private static String TAG = NetworkUtils.class.getSimpleName();
     private static final String THEMOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie"; //EXAMPLE: https://api.themoviedb.org/3/movie/popular?api_key=[YOUR_API_KEY]&language=en-US&page=1
-    private static final String API_KEY = "API";
+    private static final String API_KEY = "";
 
     private static final String PARAM_POPULAR_MOVIES = "popular";
     private static final String PARAM_BEST_RATED_MOVIES = "top_rated";
