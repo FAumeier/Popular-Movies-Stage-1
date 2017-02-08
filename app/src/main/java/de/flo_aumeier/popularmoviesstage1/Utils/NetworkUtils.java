@@ -1,3 +1,7 @@
+/*
+* Copyright (C) 2017 Aumeier Florian
+*/
+
 package de.flo_aumeier.popularmoviesstage1.Utils;
 
 import android.content.Context;
@@ -14,11 +18,11 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
- * Created by Society on 22.01.2017.
+ * Provides methods for querying the themoviedb API.
  */
-
 public class NetworkUtils {
     private static String TAG = NetworkUtils.class.getSimpleName();
+
     private static final String THEMOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie"; //EXAMPLE: https://api.themoviedb.org/3/movie/popular?api_key=[YOUR_API_KEY]&language=en-US&page=1
     private static final String API_KEY = "";
 
@@ -30,6 +34,10 @@ public class NetworkUtils {
     private static final String PARAM_PAGE = "page";
     private static final String PARAM_IMAGES = "images";
 
+    /**
+     * Builds a URL to query for the most popular movies.
+     * @return
+     */
     public static URL buildUrlPopularMovies() {
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
                 .appendEncodedPath(PARAM_POPULAR_MOVIES)
@@ -48,6 +56,10 @@ public class NetworkUtils {
         return url;
     }
 
+    /**
+     * Builds a URL to query for the best rated movies.
+     * @return
+     */
     public static URL buildUrlBestRatedMovies() {
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
                 .appendEncodedPath(PARAM_BEST_RATED_MOVIES)
@@ -66,6 +78,11 @@ public class NetworkUtils {
         return url;
     }
 
+    /**
+     * Builds a URL to query for a movie still image from a specified movie.
+     * @param movieId the ID of the movie for the still image.
+     * @return
+     */
     public static URL buildUrlMovieStills(String movieId) {
         Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
                 .appendEncodedPath(movieId)
@@ -109,6 +126,11 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     * Checks if the user has currently a connection to the internet.
+     * @param context
+     * @return
+     */
     public static boolean isOnline(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

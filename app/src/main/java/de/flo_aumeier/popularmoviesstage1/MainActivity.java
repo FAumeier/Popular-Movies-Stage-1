@@ -1,3 +1,6 @@
+/*
+* Copyright (C) 2017 Aumeier Florian
+*/
 package de.flo_aumeier.popularmoviesstage1;
 
 import android.content.Context;
@@ -17,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,14 +33,19 @@ import java.util.concurrent.ExecutionException;
 import de.flo_aumeier.popularmoviesstage1.Model.Movie;
 import de.flo_aumeier.popularmoviesstage1.Utils.NetworkUtils;
 
+/*
+* Displays the most popular movies by querying the themoviedb API.
+* Allows to display best rated movies too.
+*/
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
+    private final static String TAG = MainActivity.class.getSimpleName();
+
     public static final String INTENT_EXTRA_MOVIE_TITLE = "EXTRA_MOVIE_TITLE";
     public static final String INTENT_EXTRA_MOVIE_RATING = "EXTRA_MOVIE_RATING";
     public static final String INTENT_EXTRA_MOVIE_POSTER = "EXTRA_MOVIE_POSTER";
     public static final String INTENT_EXTRA_MOVIE_RELEASE_DATE = "EXTRA_MOVIE_RELEASE_DATE";
     public static final String INTENT_EXTRA_MOVIE_PLOT = "EXTRA_MOVIE_PLOT";
     public static final String INTENT_EXTRA_MOVIE_ID = "EXTRA_MOVIE_ID";
-    private final static String TAG = MainActivity.class.getSimpleName();
 
     private MovieAdapter mPopularMoviesAdapter;
     private MovieAdapter mBestRatedMoviesAdapter;
@@ -48,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private RelativeLayout mErrorLayout;
     private ImageButton mReloadButton;
 
-    private Toast mToast;
     private LinkedList<Movie> mMovies;
     private Context mContext;
 
@@ -57,25 +63,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
 
+        setUpToolbar();
         getViewsFromXML();
-        setUpReloadButton();
+        setUpReloadButtonOnClickListener();
 
         try {
             fetchPopularMovies();
         } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error while executing AsyncTask", e);
         } catch (NoNetworkConnectionException e) {
-            e.printStackTrace();
             displayErrorLayout();
         }
 
         setUpView();
     }
 
-    private void setUpReloadButton() {
+    private void setUpToolbar() {
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+    }
+
+    private void setUpReloadButtonOnClickListener() {
         mReloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         int itemThatWasClickedId = item.getItemId();
         switch (itemThatWasClickedId) {
             case R.id.action_refresh:
-                Log.d(TAG, "Option Refresh clicked");
                 try {
                     fetchPopularMovies();
                 } catch (ExecutionException | InterruptedException e) {
@@ -133,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 updateRecyclerView(mPopularMoviesAdapter);
                 return true;
             case R.id.sort_order_best_rated:
-                Log.d(TAG, "Order by: Best rated");
                 try {
                     fetchBestRatedMovies();
                 } catch (ExecutionException | InterruptedException e) {
@@ -145,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 updateRecyclerView(mBestRatedMoviesAdapter);
                 return true;
             case R.id.sort_order_most_popular:
-                Log.d(TAG, "Order by: Most popular");
                 try {
                     fetchPopularMovies();
                 } catch (ExecutionException | InterruptedException e) {
@@ -246,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             int id = movie.getInt("id");
             double rating = movie.getDouble("vote_average");
             Movie newMovie = new Movie(id, title, releaseDate, posterPath, plot, rating);
-            Log.d(TAG, "Adding new Movie: " + newMovie.toString());
             movies.add(newMovie);
         }
         return movies;
@@ -256,6 +261,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            showLoadingIndicator();
+        }
+
+        private void showLoadingIndicator() {
             mLoadingIndicator.setVisibility(View.VISIBLE);
             mRecyclerView.setVisibility(View.GONE);
         }
@@ -269,7 +278,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Log.d(TAG, "Results: " + queryResults);
             String JSONMovies = queryResults;
             try {
                 return parseJsonResult(JSONMovies);
@@ -281,6 +289,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         @Override
         protected void onPostExecute(LinkedList<Movie> movies) {
             super.onPostExecute(movies);
+            hideLoadingIndicator();
+        }
+
+        private void hideLoadingIndicator() {
             mRecyclerView.setVisibility(View.VISIBLE);
             mLoadingIndicator.setVisibility(View.GONE);
         }
