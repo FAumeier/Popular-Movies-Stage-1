@@ -11,4 +11,5 @@
     <string name="order_by_most_popular">Order by: Most Popular</string>
     <string name="order_by_best_rated">Order by: Best rated</string>
     <string name="can_t_load_no_internet_connection">Can\'t load: No Internet Connection</string>
+    <string name="error">Sorry! No Internet connection</string>
 </resources>
